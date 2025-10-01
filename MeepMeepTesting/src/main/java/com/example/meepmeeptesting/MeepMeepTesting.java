@@ -14,6 +14,8 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
+        myBot.setDimensions(18,18);
+
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
                 .lineToX(30)
                 .turn(Math.toRadians(90))
@@ -25,7 +27,7 @@ public class MeepMeepTesting {
                 .turn(Math.toRadians(90))
                 .build());
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
+        meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
