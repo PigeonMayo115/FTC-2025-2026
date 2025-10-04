@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /*
@@ -125,6 +126,9 @@ public class SensorHuskyLens extends LinearOpMode {
          * Note again that the device only recognizes the 36h11 family of tags out of the box.
          */
         while(opModeIsActive()) {
+
+            int i;
+
             if (!rateLimit.hasExpired()) {
                 continue;
             }
@@ -139,9 +143,13 @@ public class SensorHuskyLens extends LinearOpMode {
              *
              * Returns an empty array if no objects are seen.
              */
+
+            //The "Blocks" refer to a specific thing that the camera recognizes rather than
+            //an actual physical block like in ftc into the deep. A "block" is the bounding box around the
+            //tag on the camera's screen.
             HuskyLens.Block[] blocks = huskyLens.blocks();
             telemetry.addData("Block count", blocks.length);
-            for (int i = 0; i < blocks.length; i++) {
+            for (i = 0; i < blocks.length; i++) {
                 telemetry.addData("Block", blocks[i].toString());
                 /*
                  * Here inside the FOR loop, you could save or evaluate specific info for the currently recognized Bounding Box:
