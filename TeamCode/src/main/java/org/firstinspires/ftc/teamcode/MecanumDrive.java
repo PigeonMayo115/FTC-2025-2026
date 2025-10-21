@@ -277,6 +277,32 @@ public final class MecanumDrive {
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
     }
 
+    public void driveSimple(double leftX, double leftY, double rightX, double leftTrig) {
+        // Calculate motor power
+        double d = Math.max(Math.abs(leftY)+Math.abs(leftX)+Math.abs(rightX),1);
+        double lfp = leftY + leftX + rightX / d;
+        double rfp = leftY - leftX - rightX / d;
+        double lbp = leftY - leftX + rightX / d;
+        double rbp = leftY + leftX - rightX / d;
+
+        // Drive power reduction for fine control
+        double powerReductionFactor;
+        if (leftTrig != 0) {
+            powerReductionFactor = Math.abs(leftTrig - 1);
+            if (powerReductionFactor == 0) { // If the trigger is all the way pressed down
+                powerReductionFactor = 0.1;
+            }
+        } else {
+            powerReductionFactor = 1;
+        }
+
+        // Set motor power, multiplying by power reduction factor
+        leftFront.setPower(powerReductionFactor*lfp);
+        rightFront.setPower(powerReductionFactor*rfp);
+        leftBack.setPower(powerReductionFactor*lbp);
+        rightBack.setPower(powerReductionFactor*rbp);
+    }
+
     public final class FollowTrajectoryAction implements Action {
         public final TimeTrajectory timeTrajectory;
         private double beginTs = -1;
