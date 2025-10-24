@@ -17,6 +17,8 @@ public class Elliot2025Tele extends OpMode {
     DcMotorEx launcher;
 
     // flag for which flywheel mode we're in
+    // Comment out all instances of comments lookin like this to enable fully
+    //!
     private final boolean dualFlywheel = false;
 //    public boolean getDualFlywheel() { return dualFlywheel; } // How to get value of dualFlywheel if I need to ref outside of this class
 
@@ -43,12 +45,12 @@ public class Elliot2025Tele extends OpMode {
             launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
         } else {
-//            leftLauncher = hardwareMap.get(DcMotorEx.class, "leftLauncher");
-//            rightLauncher = hardwareMap.get(DcMotorEx.class, "leftLauncher");
-//            leftLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            rightLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            leftLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
-//            rightLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
+//!            leftLauncher = hardwareMap.get(DcMotorEx.class, "leftLauncher");
+//!            rightLauncher = hardwareMap.get(DcMotorEx.class, "leftLauncher");
+//!            leftLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//!            rightLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//!            leftLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
+//!            rightLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
         }
     }
 
@@ -111,15 +113,17 @@ public class Elliot2025Tele extends OpMode {
 
         if (a) {
             if (dualFlywheel) {
-//                leftLauncher.setVelocity(launcherTargetVelocity);
-//                rightLauncher.setVelocity(launcherTargetVelocity);
+//!                leftLauncher.setVelocity(launcherTargetVelocity);
+//!                rightLauncher.setVelocity(launcherTargetVelocity);
             } else {
+                // .setVelocity is in ticks per second
+                //
                 launcher.setVelocity(launcherTargetVelocity);
             }
         } else {
             if (dualFlywheel) {
-//                leftLauncher.setVelocity(launcherStandbyVelocity);
-//                rightLauncher.setVelocity(launcherStandbyVelocity);
+//!                leftLauncher.setVelocity(launcherStandbyVelocity);
+//!                rightLauncher.setVelocity(launcherStandbyVelocity);
             } else {
                 launcher.setVelocity(launcherStandbyVelocity);
             }
