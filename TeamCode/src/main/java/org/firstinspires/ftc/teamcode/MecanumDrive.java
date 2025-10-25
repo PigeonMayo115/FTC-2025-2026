@@ -277,6 +277,21 @@ public final class MecanumDrive {
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
     }
 
+    public PoseVelocity2d inputToPoseVelocity2D (double lx, double ly, double rx){
+        Vector2d leftStick = new Vector2d(lx, ly);
+        return new PoseVelocity2d(leftStick, rx);
+    }
+
+    public void driveBasic(double lx, double ly, double rx, double speedMult) {
+        double d = Math.max(Math.abs(ly) + Math.abs(lx) + Math.abs(rx), 1);
+
+        double flPow = (ly + lx - rx) / d;
+        double blPow = (ly - lx - rx) / d;
+        double frPow = (ly - lx + rx) / d;
+        double brPow = (ly + lx + rx) / d;
+
+    }
+
     public final class FollowTrajectoryAction implements Action {
         public final TimeTrajectory timeTrajectory;
         private double beginTs = -1;
