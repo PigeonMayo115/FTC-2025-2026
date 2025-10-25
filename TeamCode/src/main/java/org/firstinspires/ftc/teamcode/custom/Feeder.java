@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.custom;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class feeder {
+public class Feeder {
     CRServo rightFeeder;
     CRServo leftFeeder;
 
-    public feeder(HardwareMap hwmap) {
+    public Feeder(HardwareMap hwmap) {
         rightFeeder = hwmap.crservo.get("rightFeeder");
         leftFeeder = hwmap.crservo.get("leftFeeder");
     }
@@ -15,5 +15,17 @@ public class feeder {
     public void setPower(double power) {
         rightFeeder.setPower(-power);
         leftFeeder.setPower(-power);
+    }
+
+    public void spit(){
+        setPower(0.5);
+    }
+
+    public void suck(){
+        setPower(-0.5);
+    }
+
+    public void hold(){
+        setPower(0);
     }
 }
