@@ -289,6 +289,13 @@ public final class MecanumDrive {
         return new PoseVelocity2d(leftStick, rx);
     }
 
+    public PoseVelocity2d inputToPoseVelocity2D (double lx, double ly, double rx, double slowDown){
+        double spdMult = Math.max(0.1, 1 - slowDown);
+        Vector2d leftStick = new Vector2d(-ly * spdMult, -lx * spdMult);
+        return new PoseVelocity2d(leftStick, rx * spdMult);
+    }
+
+
 
     public final class FollowTrajectoryAction implements Action {
         public final TimeTrajectory timeTrajectory;
