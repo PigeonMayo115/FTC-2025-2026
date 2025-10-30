@@ -58,42 +58,47 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = 0.001932834;
-        //for elliot = 0.001932834
-        public double lateralInPerTick = 0.0013111462281489325;
-        //for elliot = 0.0013111462281489325
-        public double trackWidthTicks = 6641.518736390672;
-        //for elliot = 6641.518736390672
+        public double inPerTick = 0.00197140099;
+        //for elliot = 0.00197140099
+        //for [REDACTED] = 0.001932834
+        public double lateralInPerTick = 0.0014811315480324613;
+        //for [REDACTED] = 0.0013111462281489325
+        public double trackWidthTicks = 6171.969355200079;
+        //for elliot = 6171.969355200079
+        //for [REDACTED] = 6641.518736390672
 
         // feedforward parameters (in tick units)
-        public double kS = 0.8379717960961561;
-        //for elliot = 0.8379717960961561
-        public double kV = 0.0004011711844780795;
-        //for elliot 0.0004011711844780795
-        public double kA = 0.000015;
-        //for elliot = 0.000015
+        public double kS =  0.9108707308143988;
+        //for elliot =  0.9108707308143988
+        //for [REDACTED] = 0.8379717960961561
+        public double kV = 0.0003839154316021753;
+        //for elliot = 0.0003839154316021753
+        //for [REDACTED] 0.0004011711844780795
+        public double kA = 0.000075;
+        //for elliot = 0.000075
+        //for [REDACTED] = 0.000015
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
+        public double maxWheelVel = 25;
         public double minProfileAccel = -30;
         public double maxProfileAccel = 50;
 
         // turn profile parameters (in radians)
-        public double maxAngVel = Math.PI; // shared with path
+        public double maxAngVel = Math.PI/2; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 10.0;
-        //for elliot = 10.0
-        public double lateralGain = 0.0;
-        //for elliot = 0.0
-        public double headingGain = 3.5; // shared with turn
-        //for elliot = 3.5
+        public double axialGain = 10;
+        //for [REDACTED] = 10.0
+        public double lateralGain = 15;
+        //for [REDACTED] = 0.0
+        public double headingGain = 25; // shared with turn
+        //for [REDACTED] = 3.5
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
@@ -235,8 +240,8 @@ public final class MecanumDrive {
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBackPar");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        leftBack = hardwareMap.get(DcMotorEx.class, "leftBackPar0");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rightBackPar1");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFrontPerp");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -247,8 +252,10 @@ public final class MecanumDrive {
         // TODO: reverse motor directions if needed
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -257,7 +264,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new TwoDeadWheelLocalizer(hardwareMap, lazyImu.get(), PARAMS.inPerTick, pose);
+        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
@@ -278,19 +285,10 @@ public final class MecanumDrive {
     }
 
     public PoseVelocity2d inputToPoseVelocity2D (double lx, double ly, double rx){
-        Vector2d leftStick = new Vector2d(lx, ly);
+        Vector2d leftStick = new Vector2d(-ly, -lx);
         return new PoseVelocity2d(leftStick, rx);
     }
 
-    public void driveBasic(double lx, double ly, double rx, double speedMult) {
-        double d = Math.max(Math.abs(ly) + Math.abs(lx) + Math.abs(rx), 1);
-
-        double flPow = (ly + lx - rx) / d;
-        double blPow = (ly - lx - rx) / d;
-        double frPow = (ly - lx + rx) / d;
-        double brPow = (ly + lx + rx) / d;
-
-    }
 
     public final class FollowTrajectoryAction implements Action {
         public final TimeTrajectory timeTrajectory;

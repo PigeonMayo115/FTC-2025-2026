@@ -13,7 +13,7 @@ public class Feeder {
     }
 
     public void setPower(double power) {
-        rightFeeder.setPower(-power);
+        rightFeeder.setPower(power);
         leftFeeder.setPower(-power);
     }
 

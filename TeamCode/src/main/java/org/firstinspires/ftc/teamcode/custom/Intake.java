@@ -11,11 +11,11 @@ public class Intake {
     }
 
     public void spit(){
-        intakeMot.setPower(0.5);
+        intakeMot.setPower(1);
     }
 
     public void suck(){
-        intakeMot.setPower(-0.5);
+        intakeMot.setPower(-1);
     }
 
     public void hold(){
