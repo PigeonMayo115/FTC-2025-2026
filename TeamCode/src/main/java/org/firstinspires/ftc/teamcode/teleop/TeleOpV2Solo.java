@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
@@ -39,9 +40,9 @@ public class TeleOpV2Solo extends OpMode {
     @Override
     public void init() {
         drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-        feeder = new Feeder(hardwareMap);
+        feeder = new Feeder(hardwareMap, new ElapsedTime());
         flywheel = new Flywheel(hardwareMap);
-        intake = new Intake(hardwareMap);
+        intake = new Intake(hardwareMap, new ElapsedTime());
 
 
     }
@@ -60,6 +61,7 @@ public class TeleOpV2Solo extends OpMode {
         leftBump = gamepad1.left_bumper;
         rightBump = gamepad1.right_bumper;
         leftTrigger = gamepad1.left_trigger;
+        rightTrigger = gamepad1.right_trigger;
 
 
         drive.setDrivePowers(drive.inputToPoseVelocity2D(lx, ly, rx, leftTrigger));
@@ -67,7 +69,7 @@ public class TeleOpV2Solo extends OpMode {
         //for the 6000 rpm motor, 3000 ticks per second is the max speed of 100 percent
         if (rightTrigger >= 0.3){
             flywheel.setVelocity(targetFlywheelVel);
-        } else if (b){
+        } else {
             flywheel.setVelocity(0);
         }
 
@@ -88,13 +90,13 @@ public class TeleOpV2Solo extends OpMode {
             }
         }
         if (gamepad1.right_stick_button){
-            targetFlywheelVel = 1500;
+            targetFlywheelVel = 1400;
         }
 
         if (x){
-            intake.suck();
+            intake.gulp();
         } else if (y){
-            intake.spit();
+            intake.belch();
         } else {
             intake.hold();
         }

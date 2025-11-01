@@ -66,20 +66,21 @@ public final class MecanumDrive {
         public double inPerTick = 0.00197140099;
         //for elliot = 0.00197140099
         //for [REDACTED] = 0.001932834
-        public double lateralInPerTick = 0.0014811315480324613;
+        public double lateralInPerTick = 0.0013424015961972175;
         //for [REDACTED] = 0.0013111462281489325
-        public double trackWidthTicks = 6171.969355200079;
+        public double trackWidthTicks = 6148.206718297819;
         //for elliot = 6171.969355200079
         //for [REDACTED] = 6641.518736390672
 
         // feedforward parameters (in tick units)
-        public double kS =  0.9108707308143988;
+        public double kS =  0.9241965499600249;
         //for elliot =  0.9108707308143988
         //for [REDACTED] = 0.8379717960961561
-        public double kV = 0.0003839154316021753;
+        public double kV = 0.00037698005369597335;
+
         //for elliot = 0.0003839154316021753
         //for [REDACTED] 0.0004011711844780795
-        public double kA = 0.000075;
+        public double kA = 0.000065;
         //for elliot = 0.000075
         //for [REDACTED] = 0.000015
 
@@ -93,11 +94,11 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 10;
+        public double axialGain = 5;
         //for [REDACTED] = 10.0
-        public double lateralGain = 15;
+        public double lateralGain = 10;
         //for [REDACTED] = 0.0
-        public double headingGain = 25; // shared with turn
+        public double headingGain = 10; // shared with turn
         //for [REDACTED] = 3.5
 
         public double axialVelGain = 0.0;
@@ -290,7 +291,7 @@ public final class MecanumDrive {
     }
 
     public PoseVelocity2d inputToPoseVelocity2D (double lx, double ly, double rx, double slowDown){
-        double spdMult = Math.max(0.1, 1 - slowDown);
+        double spdMult = Math.max(0.2, 1 - slowDown);
         Vector2d leftStick = new Vector2d(-ly * spdMult, -lx * spdMult);
         return new PoseVelocity2d(leftStick, rx * spdMult);
     }

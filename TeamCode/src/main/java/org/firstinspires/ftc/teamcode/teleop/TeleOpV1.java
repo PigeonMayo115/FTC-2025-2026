@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
@@ -29,6 +30,7 @@ public class TeleOpV1 extends OpMode {
     boolean leftBump;
     boolean rightBump;
     double targetFlywheelVel = 1500;
+    ElapsedTime time = null;
 
 
 
@@ -36,10 +38,11 @@ public class TeleOpV1 extends OpMode {
 
     @Override
     public void init() {
+        time = new ElapsedTime();
         drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-        feeder = new Feeder(hardwareMap);
+        feeder = new Feeder(hardwareMap, time);
         flywheel = new Flywheel(hardwareMap);
-        intake = new Intake(hardwareMap);
+        intake = new Intake(hardwareMap, new ElapsedTime());
 
 
     }
@@ -86,9 +89,9 @@ public class TeleOpV1 extends OpMode {
         }
 
         if (x){
-            intake.suck();
+            intake.gulp();
         } else if (y){
-            intake.spit();
+            intake.belch();
         } else {
             intake.hold();
         }

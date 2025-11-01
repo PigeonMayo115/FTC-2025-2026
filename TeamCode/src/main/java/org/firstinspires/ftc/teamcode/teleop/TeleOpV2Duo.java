@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
@@ -39,9 +40,9 @@ public class TeleOpV2Duo extends OpMode {
     @Override
     public void init() {
         drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-        feeder = new Feeder(hardwareMap);
+        feeder = new Feeder(hardwareMap, new ElapsedTime());
         flywheel = new Flywheel(hardwareMap);
-        intake = new Intake(hardwareMap);
+        intake = new Intake(hardwareMap, new ElapsedTime());
 
 
     }
@@ -67,7 +68,7 @@ public class TeleOpV2Duo extends OpMode {
         //for the 6000 rpm motor, 3000 ticks per second is the max speed of 100 percent
         if (rightTrigger >= 0.3){
             flywheel.setVelocity(targetFlywheelVel);
-        } else if (b){
+        } else {
             flywheel.setVelocity(0);
         }
 
@@ -88,13 +89,13 @@ public class TeleOpV2Duo extends OpMode {
             }
         }
         if (gamepad2.right_stick_button){
-            targetFlywheelVel = 1500;
+            targetFlywheelVel = 1400;
         }
 
         if (x){
-            intake.suck();
+            intake.gulp();
         } else if (y){
-            intake.spit();
+            intake.belch();
         } else {
             intake.hold();
         }
