@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 
+import android.widget.Switch;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -26,6 +29,8 @@ public class RedAutoV1 extends OpMode {
     ElapsedTime time = null;
 
     Action turnToObelisk = null;
+    int step;
+    boolean done;
     @Override
     public void init() {
         startPose = new Pose2d(-70, 24, Math.toRadians(0));
@@ -41,6 +46,9 @@ public class RedAutoV1 extends OpMode {
                 .build();
                 //.strafeToSplineHeading(new Vector2d(-16,16), Math.toRadians(135)).build();
 
+        step = 0;
+        done = false;
+
 
     }
     @Override
@@ -50,6 +58,7 @@ public class RedAutoV1 extends OpMode {
 
     @Override
     public void loop() {
+
 
 
 
@@ -64,6 +73,27 @@ public class RedAutoV1 extends OpMode {
         //7. move into ending box
         //end
 
+        switch (step){
+            case 0:
+                done = turnToObelisk.run(new TelemetryPacket());
+                if(done){
+                    step = 5;
+                }
+                break;
+            case 5:
+                done = feeder.spit(2,time.seconds());
+                if (done){
+                    step = 10;
+                }
+                break;
+            case 10:
+                done = intake.gulp(2,time.seconds());
+                if (done){
+                    step = 15;
+                }
+                break;
+        }
+/*
         Actions.runBlocking(new SequentialAction(
                 turnToObelisk,
                 flywheel.spinUp(),
@@ -71,6 +101,7 @@ public class RedAutoV1 extends OpMode {
                 drive.actionBuilder(new Pose2d(0,0,0)).waitSeconds(3).build(),
                 intake.launchAndIntake(),
                 feeder.launch()));
-
+*/
     }
+
 }
