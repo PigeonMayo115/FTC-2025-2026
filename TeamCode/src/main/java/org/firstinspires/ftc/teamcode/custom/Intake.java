@@ -34,16 +34,17 @@ public class Intake {
             belchStart = 0;
             belchEnd = 0;
             hold();
-            return false;
+            return true;
         } else{
             belch();
-            return true;
+            return false;
         }
     }
 
     public void gulp(){
         intakeMot.setPower(-1);
     }
+
 
     public boolean gulp (double howLong, double currentTime){
         if (gulpEnd == 0){
@@ -54,11 +55,13 @@ public class Intake {
             gulpStart = 0;
             gulpEnd = 0;
             hold();
-            return false;
+            return true;
         } else{
             gulp();
-            return true;
+            return false;
         }
+
+
     }
 
     public void hold(){
@@ -75,12 +78,12 @@ public class Intake {
             }
             done = belch(0.5, time.seconds());
             if (!done){
-                return false;
+                return true;
             } else {
                 initialized = false;
                 done = true;
                 hold();
-                return true;
+                return false;
             }
         }
     }
@@ -99,12 +102,12 @@ public class Intake {
             }
             done = gulp(0.5, time.seconds());
             if (!done){
-                return false;
+                return true;
             } else {
                 initialized = false;
                 done = true;
                 hold();
-                return true;
+                return false;
             }
         }
     }

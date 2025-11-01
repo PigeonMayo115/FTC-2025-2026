@@ -44,10 +44,10 @@ public class Feeder {
             spitStart = 0;
             spitEnd = 0;
             hold();
-            return false;
+            return true;
         } else{
             spit();
-            return true;
+            return false;
         }
 
 
@@ -66,10 +66,10 @@ public class Feeder {
             suckStart = 0;
             suckEnd = 0;
             hold();
-            return false;
+            return true;
         } else{
             suck();
-            return true;
+            return false;
         }
     }
 

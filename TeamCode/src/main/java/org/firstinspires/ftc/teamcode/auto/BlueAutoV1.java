@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 
-import android.widget.Switch;
-
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,10 +14,9 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
 import org.firstinspires.ftc.teamcode.custom.Flywheel;
 import org.firstinspires.ftc.teamcode.custom.Intake;
-import org.opencv.core.Mat;
 
 @Autonomous
-public class RedAutoV1 extends OpMode {
+public class BlueAutoV1 extends OpMode {
     MecanumDrive drive = null;
     Feeder feeder = null;
     Flywheel flywheel = null;
@@ -42,7 +37,7 @@ public class RedAutoV1 extends OpMode {
     boolean done2;
     @Override
     public void init() {
-        startPose = new Pose2d(-62, 36, Math.toRadians(180));
+        startPose = new Pose2d(-62, -36, Math.toRadians(180));
         time = new ElapsedTime();
         drive = new MecanumDrive(hardwareMap, startPose);
         feeder = new Feeder(hardwareMap,time);
@@ -52,27 +47,27 @@ public class RedAutoV1 extends OpMode {
 
 
         turnToObelisk = drive.actionBuilder(startPose)
-                .strafeToConstantHeading(new Vector2d(-16,16))
-                .turnTo(Math.toRadians(225))
+                .strafeToConstantHeading(new Vector2d(-16,-16))
+                .turnTo(Math.toRadians(225-90))
                 .build();
                 //.strafeToSplineHeading(new Vector2d(-16,16), Math.toRadians(135)).build();
 
-        moveToPickup = drive.actionBuilder(new Pose2d(new Vector2d(-16,16), Math.toRadians(225)))
-                .turnTo(Math.toRadians(90))
-                .strafeToConstantHeading(new Vector2d(-20, 16))
+        moveToPickup = drive.actionBuilder(new Pose2d(new Vector2d(-16,-16), Math.toRadians(225-90)))
+                .turnTo(Math.toRadians(270))
+                .strafeToConstantHeading(new Vector2d(-20, -16))
                 .build();
 
-        reverse = drive.actionBuilder(new Pose2d(-20,16,Math.toRadians(90)))
-                .strafeToConstantHeading(new Vector2d(-20,-16))
+        reverse = drive.actionBuilder(new Pose2d(-20,-16,Math.toRadians(270)))
+                .strafeToConstantHeading(new Vector2d(-20,16))
                 .build();
 
-        returnToObelisk = drive.actionBuilder(new Pose2d(-20, -16, Math.toRadians(90)))
-                .strafeToConstantHeading(new Vector2d(-16,16))
-                .turnTo(Math.toRadians(225))
+        returnToObelisk = drive.actionBuilder(new Pose2d(-20, 16, Math.toRadians(270)))
+                .strafeToConstantHeading(new Vector2d(-16,-16))
+                .turnTo(Math.toRadians(225-90))
                 .build();
 
-        leaveLaunchZone = drive.actionBuilder(new Pose2d(-16,16,Math.toRadians(225)))
-                .strafeToConstantHeading(new Vector2d(-60,16))
+        leaveLaunchZone = drive.actionBuilder(new Pose2d(-16,-16,Math.toRadians(225-90)))
+                .strafeToConstantHeading(new Vector2d(-60,-16))
                 .build();
 
         wait = drive.actionBuilder(new Pose2d(0,0,0)).waitSeconds(2).build();

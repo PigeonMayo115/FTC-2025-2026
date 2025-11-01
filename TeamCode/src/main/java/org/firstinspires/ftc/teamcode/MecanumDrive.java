@@ -58,7 +58,7 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
@@ -158,6 +158,7 @@ public final class MecanumDrive {
             this.pose = pose;
         }
 
+
         @Override
         public void setPose(Pose2d pose) {
             this.pose = pose;
@@ -166,6 +167,10 @@ public final class MecanumDrive {
         @Override
         public Pose2d getPose() {
             return pose;
+        }
+
+        public double getHeading (){
+            return imu.getRobotYawPitchRollAngles().getYaw();
         }
 
         @Override
@@ -284,6 +289,8 @@ public final class MecanumDrive {
         rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
     }
+
+
 
     public PoseVelocity2d inputToPoseVelocity2D (double lx, double ly, double rx){
         Vector2d leftStick = new Vector2d(-ly, -lx);
