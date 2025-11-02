@@ -25,6 +25,8 @@ public class Intake {
         intakeMot.setPower(1);
     }
 
+
+
     public boolean belch (double howLong, double currentTime){
         if (belchEnd == 0){
             belchStart = currentTime;
@@ -41,8 +43,9 @@ public class Intake {
         }
     }
 
+
     public void gulp(){
-        intakeMot.setPower(-1);
+        intakeMot.setPower(-0.75);
     }
 
 

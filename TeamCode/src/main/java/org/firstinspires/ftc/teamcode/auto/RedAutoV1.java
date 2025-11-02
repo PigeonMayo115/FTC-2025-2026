@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -112,7 +113,7 @@ public class RedAutoV1 extends OpMode {
         switch (step){
             case 0:
                 done = !turnToObelisk.run(new TelemetryPacket());
-                flywheel.setVelocity(1260);
+                flywheel.setVelocity(1240);
                 if(done){
                     step = 5;
                 }
@@ -145,7 +146,7 @@ public class RedAutoV1 extends OpMode {
                 break;
             case 20:
                 done = !moveToPickup.run(new TelemetryPacket());
-                flywheel.setVelocity(1260);
+                flywheel.setVelocity(0);
                 if (done){
                     step = 25;
                 }
@@ -161,9 +162,15 @@ public class RedAutoV1 extends OpMode {
             case 30:
                 done = !returnToObelisk.run(new TelemetryPacket());
                 if (done){
-                    step = 35;
+                    step = 32;
                 }
                 break;
+            case 32:
+                flywheel.setVelocity(1260);
+                done = (flywheel.getVelocity() > 1240) && (flywheel.getVelocity() < 1280);
+                if (done){
+                    step = 35;
+                }
             case 35:
                 done = feeder.spit(2,time.seconds());
                 if (done){
