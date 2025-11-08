@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.custom;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import android.util.Size;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -10,34 +10,41 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 // I have no idea what 90% of this code does but I think it works
-public class aprilTag {
-    private Position cameraPosition = new Position(DistanceUnit.INCH,
-            0, 0, 0, 0);
-    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, -90, 0, 0);
+public class AprilTag {
+    private final VisionPortal visionPortal;
+    private final AprilTagProcessor tagProcessor;
 
-    // AprilTagProcesser actually processes the april tag for data
-    AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
-            .setDrawAxes(true) // Draws xyz axes on the april tag
-            .setDrawCubeProjection(true) // Draws a cube projection of the tag
-            .setDrawTagID(true) // Draws a box with the tag id on it
-            .setDrawTagOutline(true) // Draws a outline of the tag
-            .setCameraPose(cameraPosition, cameraOrientation) // Set camera position - kinda important
-            .build();
+    private Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
+    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
 
-    // VisionPortal feeds images from camera to the processer (Handles video)
-    VisionPortal visionPortal = new VisionPortal.Builder()
-            .addProcessor(tagProcessor) // Adds a processer (god no way)
-            .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1")) // idk why hardwareMap is italicized look at line 3
-            .setCameraResolution(new Size(640, 480))
-            .setStreamFormat(VisionPortal.StreamFormat.YUY2) // Set video stream format (YUY2 or MJPEG) ref http://localhost:63342/FTC-2025-2026/Vision-11.0.0-javadoc.jar/org/firstinspires/ftc/vision/VisionPortal.StreamFormat.html
-            .build();
+    public enum AprilTagType {
+        GPP, PGP, PPG, BLUE_GATE, RED_GATE
+    }
+
+    //<editor-fold>
+
+    // ✅ Constructor now accepts the hardwareMap from your OpMode
+    public AprilTag(HardwareMap hardwareMap) {
+        tagProcessor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setCameraPose(cameraPosition, cameraOrientation)
+                .build();
+
+        visionPortal = new VisionPortal.Builder()
+                .addProcessor(tagProcessor)
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .build();
+    }
 
     // detection.robotPose is basically the robot position btw
 
@@ -56,7 +63,7 @@ public class aprilTag {
     // I literally don't know why the return type is AprilTagDetection
     // Prob because the type of data its returning is in the type of the list...?
     public AprilTagDetection getTagInfo(int tag) {
-        if (currentDetections == null || tag > currentDetections.size()) return null;
+        if (currentDetections == null || tag < 0 || tag >= currentDetections.size()) return null;
         return currentDetections.get(tag);
     }
 
@@ -71,13 +78,15 @@ public class aprilTag {
     public Position getPositionConfident() {
         if (currentDetections == null) return null;
 
-        // Google my beloved - Couldn't figure this out
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.id == 20 || detection.id == 24) {
-                if (detection.robotPose != null) {
-                    return detection.robotPose.getPosition();
-                }
+        try {
+            AprilTagType id = getTagMeaning();
+            AprilTagDetection detection = getTagInfo(0);
+            if (detection == null || detection.robotPose == null) return null;
+            if (id == AprilTagType.BLUE_GATE || id == AprilTagType.RED_GATE) {
+                return detection.robotPose.getPosition();
             }
+        } catch (Exception ex) {
+            // todo: log error
         }
 
         // If you can't find a "confident" tag (aka one of the goals)
@@ -97,24 +106,24 @@ public class aprilTag {
         return detection.id;
     }
 
-    public String getTagMeaning() {
+    //</editor-fold>
+    public AprilTagType getTagMeaning() throws Exception {
         int id = getId();
-        String type = "";
+
         switch (id) {
             case 21:
-                type = "gpp";
+                return AprilTagType.GPP;
             case 22:
-                type = "pgp";
+                return AprilTagType.PGP;
             case 23:
-                type = "ppg";
+                return AprilTagType.PPG;
             case 20:
-                type = "blue";
+                return AprilTagType.BLUE_GATE;
             case 24:
-                type = "red";
-            default:
-                type = null; //todo - should null be something else?
+                return AprilTagType.RED_GATE;
         }
-        return type;
+
+        throw new Exception("Could not get April tag id");
     }
 
     public double getConfidence(int id) {
