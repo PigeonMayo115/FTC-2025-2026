@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.TagType;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
@@ -21,10 +22,6 @@ public class AprilTag {
 
     private Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
-
-    public enum AprilTagType {
-        GPP, PGP, PPG, BLUE_GATE, RED_GATE
-    }
 
     //<editor-fold>
 
@@ -79,10 +76,10 @@ public class AprilTag {
         if (currentDetections == null) return null;
 
         try {
-            AprilTagType id = getTagMeaning();
+            TagType id = getTagMeaning();
             AprilTagDetection detection = getTagInfo(0);
             if (detection == null || detection.robotPose == null) return null;
-            if (id == AprilTagType.BLUE_GATE || id == AprilTagType.RED_GATE) {
+            if (id == TagType.BLUE_GATE || id == TagType.RED_GATE) {
                 return detection.robotPose.getPosition();
             }
         } catch (Exception ex) {
@@ -107,23 +104,32 @@ public class AprilTag {
     }
 
     //</editor-fold>
-    public AprilTagType getTagMeaning() throws Exception {
+
+    public TagType getTagMeaning()  {
         int id = getId();
 
+        return _getTagMeaning(id);
+    }
+
+    public TagType getTagMeaning(int id)  {
+        return _getTagMeaning(id);
+    }
+
+    private TagType _getTagMeaning(int id) {
         switch (id) {
             case 21:
-                return AprilTagType.GPP;
+                return TagType.GPP;
             case 22:
-                return AprilTagType.PGP;
+                return TagType.PGP;
             case 23:
-                return AprilTagType.PPG;
+                return TagType.PPG;
             case 20:
-                return AprilTagType.BLUE_GATE;
+                return TagType.BLUE_GATE;
             case 24:
-                return AprilTagType.RED_GATE;
+                return TagType.RED_GATE;
+            default:
+                return TagType.UNKNOWN;
         }
-
-        throw new Exception("Could not get April tag id");
     }
 
     public double getConfidence(int id) {
@@ -134,6 +140,16 @@ public class AprilTag {
             }
         }
         return 0.0; // no match found
+    }
+
+    public boolean isLookingAtTag(TagType type) {
+        currentDetections = tagProcessor.getDetections();
+        AprilTagDetection detection = currentDetections.get(0); // Get tag info from first detected tag
+        int id = detection.id;
+
+        TagType result = this.getTagMeaning(id);
+
+        return result == type;
     }
 
     /* Yeah no too hard

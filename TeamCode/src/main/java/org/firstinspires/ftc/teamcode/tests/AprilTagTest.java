@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.TagType;
 import org.firstinspires.ftc.teamcode.custom.AprilTag;
 
 @TeleOp
@@ -52,7 +53,7 @@ public class AprilTagTest extends OpMode {
         }
 
         try {
-            AprilTag.AprilTagType meaning = tagHelper.getTagMeaning();
+            TagType meaning = tagHelper.getTagMeaning();
             telemetry.addData("Tag Meaning", meaning);
         } catch (Exception ex) {
             telemetry.addData("Tag Meaning", "Nothing found lmao:" + ex);
