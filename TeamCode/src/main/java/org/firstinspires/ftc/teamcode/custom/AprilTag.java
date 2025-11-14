@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.TagType;
@@ -142,14 +144,27 @@ public class AprilTag {
         return 0.0; // no match found
     }
 
-    public boolean isLookingAtTag(TagType type) {
+    public boolean isLookingAtTag(TagType tag) {
         currentDetections = tagProcessor.getDetections();
         AprilTagDetection detection = currentDetections.get(0); // Get tag info from first detected tag
         int id = detection.id;
 
         TagType result = this.getTagMeaning(id);
 
-        return result == type;
+        return result == tag;
+    }
+
+    public Pose2D getPositionRelativeToTag(TagType tag) {
+        if (isLookingAtTag(tag)) {
+            // return position relative to the tag
+            AprilTagDetection detection = currentDetections.get(0); // Get tag info from first detected tag
+
+            Position pos = detection.robotPose.getPosition();
+            // todo: figure out how to convert from a Position object to a Pose2D
+//            Pose2D output = new Pose2D(pos.unit, pos.x, pos.y, );
+        }
+
+        return null;
     }
 
     /* Yeah no too hard
