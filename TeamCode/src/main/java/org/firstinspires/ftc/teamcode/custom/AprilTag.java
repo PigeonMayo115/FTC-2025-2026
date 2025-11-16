@@ -1,3 +1,6 @@
+// todo - get distance from apriltag and get field position
+// todo late - am I lined up with target and what is my distance to the target (basically firing accuracy)
+
 package org.firstinspires.ftc.teamcode.custom;
 
 import android.util.Size;
@@ -7,34 +10,56 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.TagType;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import java.util.List;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-// I have no idea what 90% of this code does but I think it works
+import org.firstinspires.ftc.teamcode.TagType;
+
+import java.util.List;
+
 public class AprilTag {
     private final VisionPortal visionPortal;
     private final AprilTagProcessor tagProcessor;
+    /**
+     * Variables to store the position and orientation of the camera on the robot. Setting these
+     * values requires a definition of the axes of the camera and robot:
+     *
+     * Camera axes:
+     * Origin location: Center of the lens
+     * Axes orientation: +x right, +y down, +z forward (from camera's perspective)
+     *
+     * Robot axes (this is typical, but you can define this however you want):
+     * Origin location: Center of the robot at field height
+     * Axes orientation: +x right, +y forward, +z upward
+     *
+     * Position:
+     * If all values are zero (no translation), that implies the camera is at the center of the
+     * robot. Suppose your camera is positioned 5 inches to the left, 7 inches forward, and 12
+     * inches above the ground - you would need to set the position to (-5, 7, 12).
+     *
+     * Orientation:
+     * If all values are zero (no rotation), that implies the camera is pointing straight up. In
+     * most cases, you'll need to set the pitch to -90 degrees (rotation about the x-axis), meaning
+     * the camera is horizontal. Use a yaw of 0 if the camera is pointing forwards, +90 degrees if
+     * it's pointing straight left, -90 degrees for straight right, etc. You can also set the roll
+     * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
+     */
+    private Position cameraPosition = new Position(DistanceUnit.INCH, -3, 1, 9.5, 0);
+    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -70, 0, 0);
 
-    private Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
-    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
-
-    //<editor-fold>
-
-    // ✅ Constructor now accepts the hardwareMap from your OpMode
     public AprilTag(HardwareMap hardwareMap) {
+        // Constructor - configures and starts the visionPortal (Video feed) and tagProcessor (Image processing)
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
                 .setCameraPose(cameraPosition, cameraOrientation)
+                // https://ftc-docs.firstinspires.org/en/latest/programming_resources/vision/camera_calibration/camera-calibration.html
+                .setLensIntrinsics(941.675, 941.675, 336.763, 221.944) // Heya you kinda need to calibrate the camera
                 .build();
 
         visionPortal = new VisionPortal.Builder()
@@ -45,133 +70,73 @@ public class AprilTag {
                 .build();
     }
 
-    // detection.robotPose is basically the robot position btw
-
-    private List<AprilTagDetection> currentDetections; // Declare here so code no explode
+    private List<AprilTagDetection> currentDetections;
 
     public void updateTagInfo() {
-        // Update the list currentDetections update with info from the processor (idk ripped from sample)
+        // Update the list currentDetections update with info from the processor
         currentDetections = tagProcessor.getDetections();
     }
-
-    public int numTagsDetected() {
-        if (currentDetections == null) return 0;
-        return currentDetections.size();
+    public AprilTagDetection getTagInfoRaw(int id) {
+        return currentDetections.get(id);
     }
-
-    // I literally don't know why the return type is AprilTagDetection
-    // Prob because the type of data its returning is in the type of the list...?
-    public AprilTagDetection getTagInfo(int tag) {
-        if (currentDetections == null || tag < 0 || tag >= currentDetections.size()) return null;
-        return currentDetections.get(tag);
+    public TagType getTagInfo(TagType type, int id) {
+        // Overload wrapper for _getTagInfo()
+        return _getTagInfo(type, id);
     }
-
-    // I don't recommend the usage of this as this could use the obelisk tag
-    public Position getPosition() {
-        // Gets position from first detected tag
-        AprilTagDetection detection = getTagInfo(0);
-        if (detection == null || detection.robotPose == null) return null;
+    public TagType getTagInfo(TagType type) {
+        // Overload wrapper for _getTagInfo()
+        return _getTagInfo(type, 0); // Get info for tag id 0 (first)
+    }
+     public Position getPosition(int id) {
+        // Returns pos.x, pos.y, pos.z of the bot to the april tag
+        AprilTagDetection detection = getTagInfoRaw(id);
         return detection.robotPose.getPosition();
     }
 
-    public Position getPositionConfident() {
-        if (currentDetections == null) return null;
-
-        try {
-            TagType id = getTagMeaning();
-            AprilTagDetection detection = getTagInfo(0);
-            if (detection == null || detection.robotPose == null) return null;
-            if (id == TagType.BLUE_GATE || id == TagType.RED_GATE) {
-                return detection.robotPose.getPosition();
-            }
-        } catch (Exception ex) {
-            // todo: log error
-        }
-
-        // If you can't find a "confident" tag (aka one of the goals)
-        return null;
-    }
-
-    public YawPitchRollAngles getOrientation() {
-        // Gets position from first detected tag
-        AprilTagDetection detection = getTagInfo(0);
-        if (detection == null || detection.robotPose == null) return null;
-        return detection.robotPose.getOrientation();
-    }
-
-    public int getId() {
-        AprilTagDetection detection = getTagInfo(0);
-        if (detection == null) return -1; // If noting found return -1
-        return detection.id;
-    }
-
-    //</editor-fold>
-
-    public TagType getTagMeaning()  {
-        int id = getId();
-
-        return _getTagMeaning(id);
-    }
-
-    public TagType getTagMeaning(int id)  {
-        return _getTagMeaning(id);
-    }
-
-    private TagType _getTagMeaning(int id) {
-        switch (id) {
-            case 21:
-                return TagType.GPP;
-            case 22:
-                return TagType.PGP;
-            case 23:
-                return TagType.PPG;
-            case 20:
-                return TagType.BLUE_GATE;
-            case 24:
-                return TagType.RED_GATE;
+    private TagType _getTagInfo(TagType type, int id) {
+        // On second thought I don't think that this will work because I can't assign a TagType enumeration a number or something.
+        switch (type) {
+            case meaning:
+                // Returns TagType.GPP or similar
+                return AprilTagFunctions.getMeaning(id);
+            case istrackable:
+                // Returns if the tag should be tracked for position or not
+                return AprilTagFunctions.isTrackable(id);
             default:
                 return TagType.UNKNOWN;
         }
     }
 
-    public double getConfidence(int id) {
-        // Don't ask me for help here just know bigger is better (0-1)
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.id == id) {
-                return detection.decisionMargin;
+    static class AprilTagFunctions {
+        // Honestly this class kinda just holds the big functions for the _getTagInfo() method
+        private static TagType getMeaning(int id) {
+            switch (id) {
+                case 21:
+                    return TagType.GPP;
+                case 22:
+                    return TagType.PGP;
+                case 23:
+                    return TagType.PPG;
+                case 20:
+                    return TagType.BLUE_GATE;
+                case 24:
+                    return TagType.RED_GATE;
+                default:
+                    return TagType.UNKNOWN;
             }
         }
-        return 0.0; // no match found
-    }
 
-    public boolean isLookingAtTag(TagType tag) {
-        currentDetections = tagProcessor.getDetections();
-        AprilTagDetection detection = currentDetections.get(0); // Get tag info from first detected tag
-        int id = detection.id;
-
-        TagType result = this.getTagMeaning(id);
-
-        return result == tag;
-    }
-
-    public Pose2D getPositionRelativeToTag(TagType tag) {
-        if (isLookingAtTag(tag)) {
-            // return position relative to the tag
-            AprilTagDetection detection = currentDetections.get(0); // Get tag info from first detected tag
-
-            Position pos = detection.robotPose.getPosition();
-            // todo: figure out how to convert from a Position object to a Pose2D
-//            Pose2D output = new Pose2D(pos.unit, pos.x, pos.y, );
+        private static TagType isTrackable(int id) {
+            switch (id) {
+                case 21:
+                case 22:
+                case 23:
+                case 20:
+                case 24:
+                    return TagType.TRACKABLE;
+                default:
+                    return TagType.UNTRACKABLE;
+            }
         }
-
-        return null;
     }
-
-    /* Yeah no too hard
-    public double distFromTag() {
-        double actualSize = 0.206375; // (Meters) I think??? In google ai overview we trust
-        double detectedSize = detection.metadata.tagsize; // Also this errors
-        return dist;
-    }
-     */
 }

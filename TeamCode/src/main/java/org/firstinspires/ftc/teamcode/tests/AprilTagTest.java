@@ -7,16 +7,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.TagType;
-import org.firstinspires.ftc.teamcode.custom.AprilTag;
+import org.firstinspires.ftc.teamcode.custom.AprilTagOld;
 
 @TeleOp
 public class AprilTagTest extends OpMode {
 
-    private AprilTag tagHelper;
+    private AprilTagOld tagHelper;
 
     @Override
     public void init() {
-        tagHelper = new AprilTag(hardwareMap);
+        tagHelper = new AprilTagOld(hardwareMap);
     }
 
     @Override
