@@ -37,6 +37,13 @@ public class Flywheel {
 
     }
 
+    public boolean flywheelReady (double targetFlywheelVel){
+        if ((flywheelMot.getVelocity() < targetFlywheelVel*1.05) && (flywheelMot.getVelocity() > targetFlywheelVel*0.95)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public class SpinUp implements Action {
         private boolean initialized = false;
