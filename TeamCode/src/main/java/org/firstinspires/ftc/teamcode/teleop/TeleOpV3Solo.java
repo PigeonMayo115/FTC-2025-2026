@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.custom.Feeder;
 import org.firstinspires.ftc.teamcode.custom.Flywheel;
 import org.firstinspires.ftc.teamcode.custom.Intake;
 
-public class TeleOpV3Duo extends OpMode {
+public class TeleOpV3Solo extends OpMode {
     MecanumDrive drive = null;
     Feeder feeder = null;
     Flywheel flywheel = null;

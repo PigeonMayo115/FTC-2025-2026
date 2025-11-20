@@ -1,7 +1,7 @@
 // todo - get distance from apriltag and get field position
 // todo late - am I lined up with target and what is my distance to the target (basically firing accuracy)
 
-package org.firstinspires.ftc.teamcode.custom;
+package org.firstinspires.ftc.teamcode.george;
 
 import android.util.Size;
 

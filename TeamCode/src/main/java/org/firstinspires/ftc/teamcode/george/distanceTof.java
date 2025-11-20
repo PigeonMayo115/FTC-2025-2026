@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.custom;
+package org.firstinspires.ftc.teamcode.george;
 
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
