@@ -15,12 +15,12 @@ public class CheeksKicker {
     
     boolean op3 = false;
     boolean op4 = false;
-    final double kickerMin = 0.5;
-    final double kickerMax = -0.5;
-    final double leftMin = 0.5;
-    final double leftMax = -0.5;
-    final double rightMin = 0.5;
-    final double rightMax = -0.5;
+    final double kickerMin = 1;
+    final double kickerMax = -1;
+    final double leftMin = 0.65;
+    final double leftMax = 0.35;
+    final double rightMin = 0.2;
+    final double rightMax = 0.5;
 
     public CheeksKicker(HardwareMap hardwareMap) {
         hwMap = hardwareMap;
@@ -74,6 +74,7 @@ public class CheeksKicker {
             return false;
         }
     }
+
 
     public boolean kickerRetract(){
         kicker.setPosition(kickerMin);

@@ -58,30 +58,31 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 0.00197140099;
-        //for elliot = 0.00197140099
+        public double inPerTick = 0.00196439533 ;
+        //for elliot =
         //for [REDACTED] = 0.001932834
-        public double lateralInPerTick = 0.0013424015961972175;
+        public double lateralInPerTick = 0.0014627224276529494;
+        //for elliot = 0.0014627224276529494
         //for [REDACTED] = 0.0013111462281489325
-        public double trackWidthTicks = 6148.206718297819;
-        //for elliot = 6171.969355200079
+        public double trackWidthTicks = 6192.812477941771;
+        //for elliot = 6192.812477941771
         //for [REDACTED] = 6641.518736390672
 
         // feedforward parameters (in tick units)
-        public double kS =  0.9241965499600249;
-        //for elliot =  0.9108707308143988
+        public double kS =  1.008171704311431;
+        //for elliot =  1.008171704311431
         //for [REDACTED] = 0.8379717960961561
-        public double kV = 0.00037698005369597335;
+        public double kV = 0.0003873688351194425;
 
-        //for elliot = 0.0003839154316021753
+        //for elliot = 0.0003873688351194425
         //for [REDACTED] 0.0004011711844780795
-        public double kA = 0.000065;
-        //for elliot = 0.000075
+        public double kA = 0.00005;
+        //for elliot = 0.00005
         //for [REDACTED] = 0.000015
 
         // path profile parameters (in inches)
@@ -94,11 +95,14 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 5;
+        public double axialGain = 10;
+        //elliot = 10
         //for [REDACTED] = 10.0
         public double lateralGain = 10;
+        //elliot = 10
         //for [REDACTED] = 0.0
-        public double headingGain = 10; // shared with turn
+        public double headingGain = 15; // shared with turn
+        //elliot = 15
         //for [REDACTED] = 3.5
 
         public double axialVelGain = 0.0;
@@ -246,9 +250,9 @@ public final class MecanumDrive {
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBackPar0");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBackPar1");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFrontPerp");
+        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -270,7 +274,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick, pose);
+        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }

@@ -90,5 +90,5 @@ public class AprilTagRecords {
 
     -Google
      */
-    public record Tag(int id, TagType meaning, TagType isTrackable, AprilTagDetection infoRaw) {};
+    //public record Tag(int id, TagType meaning, TagType isTrackable, AprilTagDetection infoRaw) {};
 }

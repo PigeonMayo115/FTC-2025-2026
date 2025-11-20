@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -9,7 +10,7 @@ import org.firstinspires.ftc.teamcode.custom.CheeksKicker;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
 import org.firstinspires.ftc.teamcode.custom.Flywheel;
 import org.firstinspires.ftc.teamcode.custom.Intake;
-
+@TeleOp
 public class TeleOpV3Solo extends OpMode {
     MecanumDrive drive = null;
     Feeder feeder = null;
@@ -73,7 +74,8 @@ public class TeleOpV3Solo extends OpMode {
         rightBump = gamepad1.right_bumper;
         leftTrigger = gamepad1.left_trigger;
         rightTrigPress = gamepad1.right_trigger >= 0.7;
-        rightStickPress = gamepad1.right_stick_button;
+        rightStickPress = gamepad1.dpad_right;
+        leftStickPress = gamepad1.dpad_left;
 
         //set drive powers
         drive.setDrivePowers(drive.inputToPoseVelocity2D(lx, ly, rx, leftTrigger));
@@ -172,6 +174,10 @@ public class TeleOpV3Solo extends OpMode {
 
         //TODO: Implement april tag position correction system
 
+        drive.localizer.update();
+
+        telemetry.addData("Robot Position", drive.localizer.getPose().position.x + ", " + drive.localizer.getPose().position.y + ", " + Math.toDegrees(drive.localizer.getPose().heading.real));
+        telemetry.update();
 
 
 
