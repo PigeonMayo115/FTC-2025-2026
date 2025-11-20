@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.custom.CheeksKicker;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
 import org.firstinspires.ftc.teamcode.custom.Flywheel;
 import org.firstinspires.ftc.teamcode.custom.Intake;
+import org.firstinspires.ftc.teamcode.george.AprilTag;
+
 @TeleOp
 public class TeleOpV3Solo extends OpMode {
     MecanumDrive drive = null;
@@ -17,6 +19,7 @@ public class TeleOpV3Solo extends OpMode {
     Flywheel flywheel = null;
     Intake intake = null;
     CheeksKicker cheeksKicker = null;
+    AprilTag aprilTag = null;
     double lx;
     double ly;
     double rx;
@@ -52,6 +55,8 @@ public class TeleOpV3Solo extends OpMode {
         flywheel = new Flywheel(hardwareMap);
         intake = new Intake(hardwareMap, new ElapsedTime());
         cheeksKicker = new CheeksKicker(hardwareMap);
+        aprilTag = new AprilTag(hardwareMap);
+
 
     }
 
@@ -175,6 +180,9 @@ public class TeleOpV3Solo extends OpMode {
         //TODO: Implement april tag position correction system
 
         drive.localizer.update();
+
+        if (aprilTag.getPosition(24) != null){}
+
 
         telemetry.addData("Robot Position", drive.localizer.getPose().position.x + ", " + drive.localizer.getPose().position.y + ", " + Math.toDegrees(drive.localizer.getPose().heading.real));
         telemetry.update();

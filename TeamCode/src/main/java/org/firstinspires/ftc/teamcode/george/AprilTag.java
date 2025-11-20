@@ -77,6 +77,7 @@ public class AprilTag {
         currentDetections = tagProcessor.getDetections();
     }
     public AprilTagDetection getTagInfoRaw(int id) {
+        if (currentDetections == null || id < 0 || id >= currentDetections.size()) return null;
         return currentDetections.get(id);
     }
     public TagType getTagInfo(TagType type, int id) {
@@ -90,6 +91,7 @@ public class AprilTag {
      public Position getPosition(int id) {
         // Returns pos.x, pos.y, pos.z of the bot to the april tag
         AprilTagDetection detection = getTagInfoRaw(id);
+        if (detection == null || detection.robotPose == null) return null;
         return detection.robotPose.getPosition();
     }
 
