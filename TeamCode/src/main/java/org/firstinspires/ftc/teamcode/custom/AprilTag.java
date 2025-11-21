@@ -1,7 +1,7 @@
 // todo - get distance from apriltag and get field position
 // todo late - am I lined up with target and what is my distance to the target (basically firing accuracy)
 
-package org.firstinspires.ftc.teamcode.george;
+package org.firstinspires.ftc.teamcode.custom;
 
 import android.util.Size;
 
@@ -10,8 +10,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -47,7 +49,7 @@ public class AprilTag {
      * it's pointing straight left, -90 degrees for straight right, etc. You can also set the roll
      * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
      */
-    private Position cameraPosition = new Position(DistanceUnit.INCH, -3, 1, 9.5, 0);
+    private Position cameraPosition = new Position(DistanceUnit.INCH, 4.75, -3.5, 16.5, 0);
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -70, 0, 0);
 
     public AprilTag(HardwareMap hardwareMap) {
@@ -58,8 +60,8 @@ public class AprilTag {
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
                 .setCameraPose(cameraPosition, cameraOrientation)
+                .setLensIntrinsics( 813.692, 813.692, 362.284,245.145)
                 // https://ftc-docs.firstinspires.org/en/latest/programming_resources/vision/camera_calibration/camera-calibration.html
-                .setLensIntrinsics(941.675, 941.675, 336.763, 221.944) // Heya you kinda need to calibrate the camera
                 .build();
 
         visionPortal = new VisionPortal.Builder()
@@ -68,6 +70,10 @@ public class AprilTag {
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .build();
+    }
+
+    public CameraStreamSource cameraStreamSource(){
+        return visionPortal;
     }
 
     public List<AprilTagDetection> currentDetections;
@@ -93,6 +99,23 @@ public class AprilTag {
         AprilTagDetection detection = getTagInfoRaw(id);
         if (detection == null || detection.robotPose == null) return null;
         return detection.robotPose.getPosition();
+    }
+
+    public Pose2D getPositionPose2D(int id){
+        AprilTagDetection detection = getTagInfoRaw(id);
+        if (detection == null || detection.robotPose == null) {
+            return null;
+        }else {
+            return new Pose2D(
+                    DistanceUnit.INCH,
+                    detection.robotPose.getPosition().x,
+                    detection.robotPose.getPosition().y,
+                    AngleUnit.RADIANS,
+                    detection.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
+            );
+        }
+
+
     }
 
     private TagType _getTagInfo(TagType type, int id) {

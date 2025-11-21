@@ -18,7 +18,7 @@ public class TestAuto1 {
 
         myBot.setDimensions(18,18);
 
-        Pose2d startPose = new Pose2d(-62, 36, Math.toRadians(180));
+        Pose2d startPose = new Pose2d(-39, 31, Math.toRadians(180));
 
 
         Action turnToObelisk = myBot.getDrive().actionBuilder(startPose)
