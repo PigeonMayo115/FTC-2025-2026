@@ -12,15 +12,22 @@ public class CheeksKicker {
 
     boolean op1 = false;
     boolean op2 = false;
-    
+
     boolean op3 = false;
     boolean op4 = false;
-    final double kickerMin = 1;
-    final double kickerMax = -1;
+    final double kickerMin = 0.85;
+    final double kickerMax = 0.2;
     final double leftMin = 0.65;
     final double leftMax = 0.35;
     final double rightMin = 0.2;
     final double rightMax = 0.5;
+
+    private double startTimeExtend = -1;
+    private boolean hasCompletedExtend = false;
+    private double startTimeRight = -1;
+    private boolean hasCompletedRight = false;
+    private double startTimeLeft = -1;
+    private boolean hasCompletedLeft = false;
 
     public CheeksKicker(HardwareMap hardwareMap) {
         hwMap = hardwareMap;
@@ -30,50 +37,71 @@ public class CheeksKicker {
 
     }
 
-    public boolean leftUp(){
+    public boolean leftUp() {
         leftCheek.setPosition(leftMax);
-        if (leftCheek.getPosition() == leftMax){
+        if (leftCheek.getPosition() == leftMax) {
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean leftDown(){
+    public boolean leftDown() {
         leftCheek.setPosition(leftMin);
-        if (leftCheek.getPosition() == leftMin){
+        if (leftCheek.getPosition() == leftMin) {
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean rightUp(){
+    public boolean rightUp() {
         rightCheek.setPosition(rightMax);
-        if (rightCheek.getPosition() == rightMax){
+        if (rightCheek.getPosition() == rightMax) {
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean rightDown(){
+    public boolean rightDown() {
         rightCheek.setPosition(rightMin);
-        if (rightCheek.getPosition() == rightMin){
+        if (rightCheek.getPosition() == rightMin) {
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean kickerExtend(){
+    public boolean kickerExtend() {
         kicker.setPosition(kickerMax);
-        if (kicker.getPosition() == kickerMax){
+        if (kicker.getPosition() == kickerMax) {
             return true;
         } else {
             return false;
         }
     }
+
+    public boolean kickerExtend(double howLong, double currentTime) {
+
+        if (startTimeExtend < 0) {
+            startTimeExtend = currentTime; // First call - start timing
+            kicker.setPosition(kickerMax);
+            return false;
+        }
+
+        double elapsed = currentTime - startTimeExtend;
+        if (elapsed >= howLong) {
+            kicker.setPosition(kickerMin);
+            startTimeExtend = -1;
+            hasCompletedExtend = false;
+            return true;
+        }
+
+        return false;
+    }
+
+
 
 
     public boolean kickerRetract(){
@@ -86,15 +114,16 @@ public class CheeksKicker {
     }
 
     public boolean launchState(int state, boolean isWheelAtVel){
+        boolean done = false;
         switch (state){
             case 1:
                 op1 = leftDown();
                 op2 = rightDown();
                 if (isWheelAtVel) {
                     op3 = kickerExtend();
-                    if (op3){
-                        op4 = kickerRetract();
-                    }
+                    done = true;
+                } else {
+                    done = false;
                 }
                 break;
             case 2:
@@ -102,9 +131,9 @@ public class CheeksKicker {
                 op2 = rightDown();
                 if (isWheelAtVel) {
                     op3 = kickerExtend();
-                    if (op3){
-                        op4 = kickerRetract();
-                    }
+                    done = true;
+                } else {
+                    done = false;
                 }
                 break;
             case 3:
@@ -112,9 +141,9 @@ public class CheeksKicker {
                 op2 = rightUp();
                 if (isWheelAtVel) {
                     op3 = kickerExtend();
-                    if (op3){
-                        op4 = kickerRetract();
-                    }
+                    done = true;
+                } else {
+                    done = false;
                 }
                 break;
             default:
@@ -122,50 +151,41 @@ public class CheeksKicker {
                 op2 = rightUp();
                 if (isWheelAtVel) {
                     op3 = kickerExtend();
-                    if (op3){
-                        op4 = kickerRetract();
-                    }
+                    done = true;
+                } else {
+                    done = false;
                 }
                 break;
         }
-        if (op1 && op2){
-            op1 = false;
-            op2 = false;
-            op3 = false;
-            op4 = false;
-            return true;
-        } else {
-            return false;
-        }
-
+        return done;
     }
     
     public boolean intakeState (int state){
+        boolean done = false;
         switch (state){
             case 1:
                 op1 = leftDown();
                 op2 = rightDown();
+                done = true;
                 break;
             case 2:
                 op1 = leftUp();
                 op2 = rightDown();
+                done = true;
                 break;
             case 3:
                 op1 = leftUp();
                 op2 = rightUp();
+                done = true;
                 break;
             default:
                 op1 = leftUp();
                 op2 = rightUp();
+                done = true;
                 break;
         }
-        if (op1 && op2){
-            op1 = false;
-            op2 = false;
-            return true;
-        } else {
-            return false;
-        }
+        return done;
+
     }
 
 

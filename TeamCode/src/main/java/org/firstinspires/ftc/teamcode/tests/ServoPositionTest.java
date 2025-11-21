@@ -21,8 +21,8 @@ public class ServoPositionTest extends OpMode {
     //min is 0.2
     //max is 0.5
     public static double kickerPos = 1;
-    //all the way back is 1
-    //forwards is unknown
+    //all the forwards is 0.2
+    //all the way back is 0.85
     @Override
     public void init() {
         left = hardwareMap.servo.get("leftCheek");
