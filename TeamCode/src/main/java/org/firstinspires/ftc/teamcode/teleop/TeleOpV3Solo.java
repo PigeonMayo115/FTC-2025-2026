@@ -1,14 +1,19 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.custom.CheeksKicker;
 import org.firstinspires.ftc.teamcode.custom.Feeder;
 import org.firstinspires.ftc.teamcode.custom.Flywheel;
 import org.firstinspires.ftc.teamcode.custom.Intake;
+import org.firstinspires.ftc.teamcode.george.AprilTag;
 
 public class TeleOpV3Solo extends OpMode {
     MecanumDrive drive = null;
@@ -16,6 +21,9 @@ public class TeleOpV3Solo extends OpMode {
     Flywheel flywheel = null;
     Intake intake = null;
     CheeksKicker cheeksKicker = null;
+    AprilTag aprilTag = null;
+    Position bot3dPosition;
+    Pose2d botPosition;
     double lx;
     double ly;
     double rx;
@@ -51,7 +59,7 @@ public class TeleOpV3Solo extends OpMode {
         flywheel = new Flywheel(hardwareMap);
         intake = new Intake(hardwareMap, new ElapsedTime());
         cheeksKicker = new CheeksKicker(hardwareMap);
-
+        aprilTag = new AprilTag(hardwareMap);
     }
 
     @Override
@@ -59,6 +67,7 @@ public class TeleOpV3Solo extends OpMode {
 
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void loop() {
         ly = gamepad1.left_stick_y;
@@ -171,9 +180,19 @@ public class TeleOpV3Solo extends OpMode {
         //5.when the angle is correct and the flywheel are correct, launch turn light green and launch ball
 
         //TODO: Implement april tag position correction system
-
-
-
+        aprilTag.updateTagInfo(); // Update tag info from vision processor
+        // inefficient code 100
+        if (aprilTag.getPosition(24) == null) {
+            if (aprilTag.getPosition(20) == null) {
+                // todo - do nothing here
+            } else {
+                bot3dPosition = aprilTag.getPosition(20);
+            }
+        } else {
+            bot3dPosition = aprilTag.getPosition(24);
+        }
+        telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", bot3dPosition.x, bot3dPosition.y, bot3dPosition.z));
+        botPosition = null;
 
     }
     double kP = 0.1;      // Responsiveness (0.05-0.3 usually good)

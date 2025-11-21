@@ -70,7 +70,7 @@ public class AprilTag {
                 .build();
     }
 
-    private List<AprilTagDetection> currentDetections;
+    public List<AprilTagDetection> currentDetections;
 
     public void updateTagInfo() {
         // Update the list currentDetections update with info from the processor
@@ -88,7 +88,7 @@ public class AprilTag {
         return _getTagInfo(type, 0); // Get info for tag id 0 (first)
     }
      public Position getPosition(int id) {
-        // Returns pos.x, pos.y, pos.z of the bot to the april tag
+        // Returns pos.x, pos.y, pos.z of the bot on the field
         AprilTagDetection detection = getTagInfoRaw(id);
         return detection.robotPose.getPosition();
     }
