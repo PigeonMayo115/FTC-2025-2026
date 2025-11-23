@@ -36,7 +36,7 @@ public class AprilTagBruce {
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
                 .setCameraPose(cameraPosition, cameraOrientation)
-                .setLensIntrinsics( 813.692, 813.692, 362.284,245.145)
+                //.setLensIntrinsics( 813.692, 813.692, 362.284,245.145)
                 .setOutputUnits(DistanceUnit.INCH,AngleUnit.RADIANS)
                 // https://ftc-docs.firstinspires.org/en/latest/programming_resources/vision/camera_calibration/camera-calibration.html
                 .build();

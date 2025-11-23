@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.custom;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class CheeksKicker {
 
@@ -17,29 +18,37 @@ public class CheeksKicker {
     boolean op4 = false;
     final double kickerMin = 0.85;
     final double kickerMax = 0.2;
-    final double leftMin = 0.65;
+    final double leftMin = 0;
     final double leftMax = 0.35;
     final double rightMin = 0.2;
     final double rightMax = 0.5;
 
-    private double startTimeExtend = -1;
+    private double extendStart = 0;
+    private double extendEnd = 0;
     private boolean hasCompletedExtend = false;
     private double startTimeRight = -1;
     private boolean hasCompletedRight = false;
     private double startTimeLeft = -1;
     private boolean hasCompletedLeft = false;
+    ElapsedTime elapsedTime = null;
+    boolean launchDone = false;
+    boolean waitDone = false;
+    int state = 1;
+    boolean isLaunch = true;
+    boolean lastUpState = false;
+    boolean lastDownState = false;
 
-    public CheeksKicker(HardwareMap hardwareMap) {
+    public CheeksKicker(HardwareMap hardwareMap, ElapsedTime elapsedTime) {
         hwMap = hardwareMap;
         kicker = hwMap.servo.get("kicker");
         leftCheek = hwMap.servo.get("leftCheek");
         rightCheek = hwMap.servo.get("rightCheek");
-
+        this.elapsedTime = elapsedTime;
     }
 
     public boolean leftUp() {
-        leftCheek.setPosition(leftMax);
-        if (leftCheek.getPosition() == leftMax) {
+        leftCheek.setPosition(leftMin);
+        if (leftCheek.getPosition() == leftMin) {
             return true;
         } else {
             return false;
@@ -47,8 +56,8 @@ public class CheeksKicker {
     }
 
     public boolean leftDown() {
-        leftCheek.setPosition(leftMin);
-        if (leftCheek.getPosition() == leftMin) {
+        leftCheek.setPosition(leftMax);
+        if (leftCheek.getPosition() == leftMax) {
             return true;
         } else {
             return false;
@@ -82,23 +91,24 @@ public class CheeksKicker {
         }
     }
 
-    public boolean kickerExtend(double howLong, double currentTime) {
+    public boolean kickerExtend(double howLong) {
 
-        if (startTimeExtend < 0) {
-            startTimeExtend = currentTime; // First call - start timing
+        double currentTime = elapsedTime.seconds();
+
+        if (extendEnd == 0){
+            extendStart = currentTime;
+            extendEnd = currentTime + howLong;
+        }
+        if (currentTime > extendStart + howLong){
+            extendStart = 0;
+            extendEnd = 0;
+            kicker.setPosition(kickerMin);
+            return true;
+        } else{
             kicker.setPosition(kickerMax);
             return false;
         }
 
-        double elapsed = currentTime - startTimeExtend;
-        if (elapsed >= howLong) {
-            kicker.setPosition(kickerMin);
-            startTimeExtend = -1;
-            hasCompletedExtend = false;
-            return true;
-        }
-
-        return false;
     }
 
 
@@ -113,51 +123,30 @@ public class CheeksKicker {
         }
     }
 
-    public boolean launchState(int state, boolean isWheelAtVel){
-        boolean done = false;
+
+
+    public void launchState(int state){
         switch (state){
             case 1:
-                op1 = leftDown();
-                op2 = rightDown();
-                if (isWheelAtVel) {
-                    op3 = kickerExtend();
-                    done = true;
-                } else {
-                    done = false;
+                launchDone = kickerExtend(1);
+                if (launchDone){
+                    intakeState(state);
                 }
                 break;
             case 2:
-                op1 = leftUp();
-                op2 = rightDown();
-                if (isWheelAtVel) {
-                    op3 = kickerExtend();
-                    done = true;
-                } else {
-                    done = false;
+                launchDone = kickerExtend(1);
+                if (launchDone){
+                    intakeState(state);
                 }
                 break;
             case 3:
-                op1 = leftUp();
-                op2 = rightUp();
-                if (isWheelAtVel) {
-                    op3 = kickerExtend();
-                    done = true;
-                } else {
-                    done = false;
-                }
-                break;
-            default:
-                op1 = leftUp();
-                op2 = rightUp();
-                if (isWheelAtVel) {
-                    op3 = kickerExtend();
-                    done = true;
-                } else {
-                    done = false;
+                launchDone = kickerExtend(1);
+                if (launchDone){
+                    intakeState(state);
                 }
                 break;
         }
-        return done;
+
     }
     
     public boolean intakeState (int state){
@@ -185,6 +174,26 @@ public class CheeksKicker {
                 break;
         }
         return done;
+
+    }
+
+    public void update (boolean upValue, boolean downValue){
+
+        if (upValue && !lastUpState && state < 3) {
+            state++;
+            isLaunch = false;
+        }
+        lastUpState = upValue;
+
+        //decrement state by one and cycle launch on right bump press
+        if (downValue && !lastDownState && state > 1) {
+            state--;
+            isLaunch = true;
+        }
+        lastDownState = downValue;
+
+        intakeState(state);
+
 
     }
 

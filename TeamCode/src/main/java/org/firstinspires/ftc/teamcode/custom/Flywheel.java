@@ -18,11 +18,34 @@ public class Flywheel {
     double d = 4;
     double f = 10;
 
+    double flyWheelTarget = 1350;
+
+    boolean lastUpState = false;
+    boolean lastDownState = false;
+
     public Flywheel(HardwareMap hwmap) {
         flywheelMot = hwmap.get(DcMotorEx.class, "flywheel");
         flywheelMot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheelMot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
         flywheelMot.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+    
+    public double flywheelIncrement (boolean up, boolean down){
+
+        if (up && !lastUpState) {
+            flyWheelTarget += 10;
+        }
+        boolean lastUpState = up;
+
+
+        //decrement state by one and cycle launch on right bump press
+        if (down && !lastDownState) {
+            flyWheelTarget -= 10;
+        }
+        boolean lastDownState = down;
+
+        return flyWheelTarget;
+        
     }
 
 
